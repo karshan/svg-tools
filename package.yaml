@@ -1,0 +1,30 @@
+name:                svg-tools
+version:             0.1.0.0
+github:              "karshan/svg-tools"
+license:             BSD3
+author:              "Karshan Sharma"
+maintainer:          "karshan.sharma@gmail.com"
+copyright:           "2019 Karshan Sharma"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/karshan/svg-tools#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- xml
+
+library:
+  source-dirs: src
+
+executables:
+  svg-tools:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - svg-tools
