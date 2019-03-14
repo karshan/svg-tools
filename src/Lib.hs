@@ -3,6 +3,11 @@ module Lib where
 import Data.Bool (bool)
 import Text.XML.Light
 
+type CFilter = Content -> [Content]
+
+o :: CFilter -> CFilter -> CFilter
+f `o` g = concatMap f . g
+
 processXML :: (Content -> [Content]) -> String -> String
 processXML f = concatMap showContent . concatMap go . parseXML
     where
@@ -25,8 +30,19 @@ addAttr attr e = e { elAttribs = attr:elAttribs e }
 removeAttr :: String -> Element -> Element
 removeAttr attr e = e { elAttribs = filter (\a -> attrKey a /= QName attr Nothing Nothing) (elAttribs e) }
 
-addIconClasses :: Content -> [Content]
-addIconClasses (Elem e) = return $
-    Elem $ (removeAttr "id" .
-        bool (removeAttr "stroke-width") (addAttr (mkAttr "class" "icon_svg-stroke icon_svg-fill")) (isStrokeFill e)) e
+removeAttr' :: String -> CFilter
+removeAttr' attr (Elem e) = [Elem $ e { elAttribs = filter (\a -> attrKey a /= QName attr Nothing Nothing) (elAttribs e) }]
+removeAttr' _ c = [c]
+
+addIconClasses :: CFilter
+addIconClasses c@(Elem e)
+    | isStrokeFill e = [Elem (addAttr (mkAttr "class" "icon_svg-stroke icon_svg-fill") e)]
+    | otherwise = [c]
 addIconClasses c = [c]
+
+removeUselessTags :: CFilter
+removeUselessTags c@(Elem e) = let n = qName (elName e) in bool [c] [] (n `elem` ["title", "desc", "defs"])
+removeUselessTags c = [c]
+
+mkIcon :: String -> String
+mkIcon = processXML (addIconClasses `o` removeAttr' "stroke-width" `o` removeAttr' "id" `o` removeUselessTags)

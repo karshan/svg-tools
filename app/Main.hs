@@ -1,9 +1,9 @@
 module Main where
 
 import System.Environment (getArgs)
-import Lib (processXML, addIconClasses)
+import Lib (processXML, mkIcon)
 
 main :: IO ()
 main = do
     (f:_) <- getArgs
-    putStr . processXML addIconClasses =<< readFile f
+    putStr . mkIcon =<< readFile f
