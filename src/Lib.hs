@@ -12,7 +12,7 @@ processXML :: (Content -> [Content]) -> String -> String
 processXML f = concatMap showContent . concatMap go . parseXML
     where
         go :: Content -> [Content]
-        go (Elem e) = [Elem $ e { elContent = concatMap f (elContent e) }]
+        go (Elem e) = [Elem $ e { elContent = concatMap go (elContent e) }]
         go c = f c
 
 hasAttr :: String -> Element -> Bool
